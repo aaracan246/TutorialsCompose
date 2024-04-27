@@ -198,86 +198,146 @@ import androidx.compose.ui.unit.sp
 //}
 
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.LocalIndication
+//import androidx.compose.animation.AnimatedContent
+//import androidx.compose.animation.ExperimentalAnimationApi
+//import androidx.compose.foundation.LocalIndication
+//import androidx.compose.foundation.PointerMatcher
+//import androidx.compose.foundation.indication
+//import androidx.compose.foundation.interaction.MutableInteractionSource
+//import androidx.compose.foundation.layout.size
+//import androidx.compose.foundation.onClick
+//import androidx.compose.ui.input.pointer.PointerButton
+//import androidx.compose.ui.input.pointer.isAltPressed
+//import androidx.compose.ui.input.pointer.isShiftPressed
+//import androidx.compose.ui.text.style.TextAlign
+//import androidx.compose.ui.unit.dp
+//
+//
+//@Composable
+//@OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
+//fun Tuto3_7() {
+//    Column {
+//        var topBoxText by remember { mutableStateOf("Click me\nusing LMB or LMB + Shift") }
+//        var topBoxCount by remember { mutableStateOf(0) }
+//        // No indication on interaction
+//        Box(modifier = Modifier.size(200.dp, 100.dp).background(Color.Blue)
+//            // the most generic click handler (without extra conditions) should be the first one
+//            .onClick {
+//                // it will receive all LMB clicks except when Shift is pressed
+//                println("Click with primary button")
+//                topBoxText = "LMB ${topBoxCount++}"
+//            }.onClick(
+//                keyboardModifiers = { isShiftPressed } // accept clicks only when Shift pressed
+//            ) {
+//                // it will receive all LMB clicks when Shift is pressed
+//                println("Click with primary button and shift pressed")
+//                topBoxCount++
+//                topBoxText = "LMB + Shift ${topBoxCount++}"
+//            }
+//        ) {
+//            AnimatedContent(
+//                targetState = topBoxText,
+//                modifier = Modifier.align(Alignment.Center)
+//            ) {
+//                Text(text = it, textAlign = TextAlign.Center)
+//            }
+//        }
+//
+//        var bottomBoxText by remember { mutableStateOf("Click me\nusing LMB or\nRMB + Alt") }
+//        var bottomBoxCount by remember { mutableStateOf(0) }
+//        val interactionSource = remember { MutableInteractionSource() }
+//        // With indication on interaction
+//        Box(modifier = Modifier.size(200.dp, 100.dp).background(Color.Yellow)
+//            .onClick(
+//                enabled = true,
+//                interactionSource = interactionSource,
+//                matcher = PointerMatcher.mouse(PointerButton.Secondary), // Right Mouse Button
+//                keyboardModifiers = { isAltPressed }, // accept clicks only when Alt pressed
+//                onLongClick = { // optional
+//                    bottomBoxText = "RMB Long Click + Alt ${bottomBoxCount++}"
+//                    println("Long Click with secondary button and Alt pressed")
+//                },
+//                onDoubleClick = { // optional
+//                    bottomBoxText = "RMB Double Click + Alt ${bottomBoxCount++}"
+//                    println("Double Click with secondary button and Alt pressed")
+//                },
+//                onClick = {
+//                    bottomBoxText = "RMB Click + Alt ${bottomBoxCount++}"
+//                    println("Click with secondary button and Alt pressed")
+//                }
+//            )
+//            .onClick(interactionSource = interactionSource) { // use default parameters
+//                bottomBoxText = "LMB Click ${bottomBoxCount++}"
+//                println("Click with primary button (mouse left button)")
+//            }
+//            .indication(interactionSource, LocalIndication.current)
+//        ) {
+//            AnimatedContent(
+//                targetState = bottomBoxText,
+//                modifier = Modifier.align(Alignment.Center)
+//            ) {
+//                Text(text = it, textAlign = TextAlign.Center)
+//            }
+//        }
+//    }
+//}
+
+
 import androidx.compose.foundation.PointerMatcher
-import androidx.compose.foundation.indication
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.gestures.onDrag
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.onClick
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerButton
-import androidx.compose.ui.input.pointer.isAltPressed
-import androidx.compose.ui.input.pointer.isShiftPressed
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.input.pointer.isCtrlPressed
+import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 
-
 @Composable
-@OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
-fun Tuto3_7() {
+@OptIn(ExperimentalFoundationApi::class)
+fun Tuto3_8() {
+    val windowInfo = LocalWindowInfo.current
+
     Column {
-        var topBoxText by remember { mutableStateOf("Click me\nusing LMB or LMB + Shift") }
-        var topBoxCount by remember { mutableStateOf(0) }
-        // No indication on interaction
-        Box(modifier = Modifier.size(200.dp, 100.dp).background(Color.Blue)
-            // the most generic click handler (without extra conditions) should be the first one
-            .onClick {
-                // it will receive all LMB clicks except when Shift is pressed
-                println("Click with primary button")
-                topBoxText = "LMB ${topBoxCount++}"
-            }.onClick(
-                keyboardModifiers = { isShiftPressed } // accept clicks only when Shift pressed
-            ) {
-                // it will receive all LMB clicks when Shift is pressed
-                println("Click with primary button and shift pressed")
-                topBoxCount++
-                topBoxText = "LMB + Shift ${topBoxCount++}"
+        var topBoxOffset by remember { mutableStateOf(Offset(0f, 0f)) }
+
+        Box(modifier = Modifier.offset {
+            IntOffset(topBoxOffset.x.toInt(), topBoxOffset.y.toInt())
+        }.size(100.dp)
+            .background(Color.Green)
+            .onDrag { // all default: enabled = true, matcher = PointerMatcher.Primary (left mouse button)
+                topBoxOffset += it
             }
         ) {
-            AnimatedContent(
-                targetState = topBoxText,
-                modifier = Modifier.align(Alignment.Center)
-            ) {
-                Text(text = it, textAlign = TextAlign.Center)
-            }
+            Text(text = "Drag with LMB", modifier = Modifier.align(Alignment.Center))
         }
 
-        var bottomBoxText by remember { mutableStateOf("Click me\nusing LMB or\nRMB + Alt") }
-        var bottomBoxCount by remember { mutableStateOf(0) }
-        val interactionSource = remember { MutableInteractionSource() }
-        // With indication on interaction
-        Box(modifier = Modifier.size(200.dp, 100.dp).background(Color.Yellow)
-            .onClick(
+        var bottomBoxOffset by remember { mutableStateOf(Offset(0f, 0f)) }
+
+        Box(modifier = Modifier.offset {
+            IntOffset(bottomBoxOffset.x.toInt(), bottomBoxOffset.y.toInt())
+        }.size(100.dp)
+            .background(Color.LightGray)
+            .onDrag(
                 enabled = true,
-                interactionSource = interactionSource,
-                matcher = PointerMatcher.mouse(PointerButton.Secondary), // Right Mouse Button
-                keyboardModifiers = { isAltPressed }, // accept clicks only when Alt pressed
-                onLongClick = { // optional
-                    bottomBoxText = "RMB Long Click + Alt ${bottomBoxCount++}"
-                    println("Long Click with secondary button and Alt pressed")
+                matcher = PointerMatcher.mouse(PointerButton.Secondary), // right mouse button
+                onDragStart = {
+                    println("Gray Box: drag start")
                 },
-                onDoubleClick = { // optional
-                    bottomBoxText = "RMB Double Click + Alt ${bottomBoxCount++}"
-                    println("Double Click with secondary button and Alt pressed")
-                },
-                onClick = {
-                    bottomBoxText = "RMB Click + Alt ${bottomBoxCount++}"
-                    println("Click with secondary button and Alt pressed")
+                onDragEnd = {
+                    println("Gray Box: drag end")
                 }
-            )
-            .onClick(interactionSource = interactionSource) { // use default parameters
-                bottomBoxText = "LMB Click ${bottomBoxCount++}"
-                println("Click with primary button (mouse left button)")
-            }
-            .indication(interactionSource, LocalIndication.current)
-        ) {
-            AnimatedContent(
-                targetState = bottomBoxText,
-                modifier = Modifier.align(Alignment.Center)
             ) {
-                Text(text = it, textAlign = TextAlign.Center)
+                val keyboardModifiers = windowInfo.keyboardModifiers
+                bottomBoxOffset += if (keyboardModifiers.isCtrlPressed) it * 2f else it
             }
+        ) {
+            Text(text = "Drag with RMB,\ntry with CTRL", modifier = Modifier.align(Alignment.Center))
         }
     }
 }
