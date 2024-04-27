@@ -26,6 +26,6 @@ fun App() {
 
 fun main() = application {
     Window(onCloseRequest = ::exitApplication) {
-        Tuto3_5()
+        Tuto3_6()
     }
 }

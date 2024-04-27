@@ -135,29 +135,65 @@ import androidx.compose.ui.unit.sp
 //}
 
 
+//import androidx.compose.foundation.layout.fillMaxSize
+//import androidx.compose.runtime.getValue
+//import androidx.compose.runtime.mutableStateOf
+//import androidx.compose.runtime.remember
+//import androidx.compose.runtime.setValue
+//import androidx.compose.ui.ExperimentalComposeUiApi
+//import androidx.compose.ui.awt.awtEventOrNull
+//import androidx.compose.ui.input.pointer.PointerEventType
+//import androidx.compose.ui.input.pointer.onPointerEvent
+//
+//@Composable
+//@OptIn(ExperimentalComposeUiApi::class)
+//fun Tuto3_5() {
+//    var text by remember { mutableStateOf("") }
+//
+//    Box(
+//        Modifier
+//            .fillMaxSize()
+//            .onPointerEvent(PointerEventType.Press) {
+//                text = it.awtEventOrNull?.locationOnScreen?.toString().orEmpty()
+//            },
+//        contentAlignment = Alignment.Center
+//    ) {
+//        Text(text)
+//    }
+//}
+
+
+
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.awt.awtEventOrNull
 import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.onPointerEvent
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.window.singleWindowApplication
 
 @Composable
-@OptIn(ExperimentalComposeUiApi::class)
-fun Tuto3_5() {
-    var text by remember { mutableStateOf("") }
+fun Tuto3_6() {
+    val list = remember { mutableStateListOf<String>() }
 
-    Box(
+    Column(
         Modifier
             .fillMaxSize()
-            .onPointerEvent(PointerEventType.Press) {
-                text = it.awtEventOrNull?.locationOnScreen?.toString().orEmpty()
+            .pointerInput(Unit) {
+                awaitPointerEventScope {
+                    while (true) {
+                        val event = awaitPointerEvent()
+                        val position = event.changes.first().position
+                        // on every relayout Compose will send synthetic Move event,
+                        // so we skip it to avoid event spam
+                        if (event.type != PointerEventType.Move) {
+                            list.add(0, "${event.type} $position")
+                        }
+                    }
+                }
             },
-        contentAlignment = Alignment.Center
     ) {
-        Text(text)
+        for (item in list.take(20)) {
+            Text(item)
+        }
     }
 }
