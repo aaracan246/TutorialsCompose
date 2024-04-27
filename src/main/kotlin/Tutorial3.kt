@@ -108,28 +108,56 @@ import androidx.compose.ui.unit.sp
 //}
 
 
+//import androidx.compose.foundation.layout.fillMaxSize
+//import androidx.compose.runtime.getValue
+//import androidx.compose.runtime.mutableStateOf
+//import androidx.compose.runtime.remember
+//import androidx.compose.runtime.setValue
+//import androidx.compose.ui.ExperimentalComposeUiApi
+//import androidx.compose.ui.input.pointer.PointerEventType
+//import androidx.compose.ui.input.pointer.onPointerEvent
+//
+//
+//@Composable
+//@OptIn(ExperimentalComposeUiApi::class)
+//fun Tuto3_4()  {
+//    var number by remember { mutableStateOf(0f) }
+//    Box(
+//        Modifier
+//            .fillMaxSize()
+//            .onPointerEvent(PointerEventType.Scroll) {
+//                number += it.changes.first().scrollDelta.y
+//            },
+//        contentAlignment = Alignment.Center
+//    ) {
+//        Text("Scroll to change the number: $number", fontSize = 30.sp)
+//    }
+//}
+
+
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.awt.awtEventOrNull
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 
-
 @Composable
 @OptIn(ExperimentalComposeUiApi::class)
-fun Tuto3_4()  {
-    var number by remember { mutableStateOf(0f) }
+fun Tuto3_5() {
+    var text by remember { mutableStateOf("") }
+
     Box(
         Modifier
             .fillMaxSize()
-            .onPointerEvent(PointerEventType.Scroll) {
-                number += it.changes.first().scrollDelta.y
+            .onPointerEvent(PointerEventType.Press) {
+                text = it.awtEventOrNull?.locationOnScreen?.toString().orEmpty()
             },
         contentAlignment = Alignment.Center
     ) {
-        Text("Scroll to change the number: $number", fontSize = 30.sp)
+        Text(text)
     }
 }
