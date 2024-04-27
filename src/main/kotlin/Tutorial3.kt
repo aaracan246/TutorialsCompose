@@ -164,36 +164,120 @@ import androidx.compose.ui.unit.sp
 
 
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.window.singleWindowApplication
+//import androidx.compose.foundation.layout.fillMaxSize
+//import androidx.compose.runtime.mutableStateListOf
+//import androidx.compose.runtime.remember
+//import androidx.compose.ui.input.pointer.PointerEventType
+//import androidx.compose.ui.input.pointer.pointerInput
+//
+//@Composable
+//fun Tuto3_6() {
+//    val list = remember { mutableStateListOf<String>() }
+//
+//    Column(
+//        Modifier
+//            .fillMaxSize()
+//            .pointerInput(Unit) {
+//                awaitPointerEventScope {
+//                    while (true) {
+//                        val event = awaitPointerEvent()
+//                        val position = event.changes.first().position
+//                        // on every relayout Compose will send synthetic Move event,
+//                        // so we skip it to avoid event spam
+//                        if (event.type != PointerEventType.Move) {
+//                            list.add(0, "${event.type} $position")
+//                        }
+//                    }
+//                }
+//            },
+//    ) {
+//        for (item in list.take(20)) {
+//            Text(item)
+//        }
+//    }
+//}
+
+
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.PointerMatcher
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.onClick
+import androidx.compose.ui.input.pointer.PointerButton
+import androidx.compose.ui.input.pointer.isAltPressed
+import androidx.compose.ui.input.pointer.isShiftPressed
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+
 
 @Composable
-fun Tuto3_6() {
-    val list = remember { mutableStateListOf<String>() }
+@OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
+fun Tuto3_7() {
+    Column {
+        var topBoxText by remember { mutableStateOf("Click me\nusing LMB or LMB + Shift") }
+        var topBoxCount by remember { mutableStateOf(0) }
+        // No indication on interaction
+        Box(modifier = Modifier.size(200.dp, 100.dp).background(Color.Blue)
+            // the most generic click handler (without extra conditions) should be the first one
+            .onClick {
+                // it will receive all LMB clicks except when Shift is pressed
+                println("Click with primary button")
+                topBoxText = "LMB ${topBoxCount++}"
+            }.onClick(
+                keyboardModifiers = { isShiftPressed } // accept clicks only when Shift pressed
+            ) {
+                // it will receive all LMB clicks when Shift is pressed
+                println("Click with primary button and shift pressed")
+                topBoxCount++
+                topBoxText = "LMB + Shift ${topBoxCount++}"
+            }
+        ) {
+            AnimatedContent(
+                targetState = topBoxText,
+                modifier = Modifier.align(Alignment.Center)
+            ) {
+                Text(text = it, textAlign = TextAlign.Center)
+            }
+        }
 
-    Column(
-        Modifier
-            .fillMaxSize()
-            .pointerInput(Unit) {
-                awaitPointerEventScope {
-                    while (true) {
-                        val event = awaitPointerEvent()
-                        val position = event.changes.first().position
-                        // on every relayout Compose will send synthetic Move event,
-                        // so we skip it to avoid event spam
-                        if (event.type != PointerEventType.Move) {
-                            list.add(0, "${event.type} $position")
-                        }
-                    }
+        var bottomBoxText by remember { mutableStateOf("Click me\nusing LMB or\nRMB + Alt") }
+        var bottomBoxCount by remember { mutableStateOf(0) }
+        val interactionSource = remember { MutableInteractionSource() }
+        // With indication on interaction
+        Box(modifier = Modifier.size(200.dp, 100.dp).background(Color.Yellow)
+            .onClick(
+                enabled = true,
+                interactionSource = interactionSource,
+                matcher = PointerMatcher.mouse(PointerButton.Secondary), // Right Mouse Button
+                keyboardModifiers = { isAltPressed }, // accept clicks only when Alt pressed
+                onLongClick = { // optional
+                    bottomBoxText = "RMB Long Click + Alt ${bottomBoxCount++}"
+                    println("Long Click with secondary button and Alt pressed")
+                },
+                onDoubleClick = { // optional
+                    bottomBoxText = "RMB Double Click + Alt ${bottomBoxCount++}"
+                    println("Double Click with secondary button and Alt pressed")
+                },
+                onClick = {
+                    bottomBoxText = "RMB Click + Alt ${bottomBoxCount++}"
+                    println("Click with secondary button and Alt pressed")
                 }
-            },
-    ) {
-        for (item in list.take(20)) {
-            Text(item)
+            )
+            .onClick(interactionSource = interactionSource) { // use default parameters
+                bottomBoxText = "LMB Click ${bottomBoxCount++}"
+                println("Click with primary button (mouse left button)")
+            }
+            .indication(interactionSource, LocalIndication.current)
+        ) {
+            AnimatedContent(
+                targetState = bottomBoxText,
+                modifier = Modifier.align(Alignment.Center)
+            ) {
+                Text(text = it, textAlign = TextAlign.Center)
+            }
         }
     }
 }
