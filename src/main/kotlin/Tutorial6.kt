@@ -203,33 +203,106 @@
 //}
 
 
-import androidx.compose.foundation.background
+//import androidx.compose.foundation.background
+//import androidx.compose.foundation.layout.Column
+//import androidx.compose.foundation.layout.Row
+//import androidx.compose.foundation.layout.padding
+//import androidx.compose.foundation.layout.size
+//import androidx.compose.material.Text
+//import androidx.compose.ui.Modifier
+//import androidx.compose.ui.graphics.Color
+//import androidx.compose.ui.unit.Dp
+//import androidx.compose.ui.unit.dp
+//import androidx.compose.ui.window.Window
+//import androidx.compose.ui.window.application
+//import androidx.compose.ui.window.rememberWindowState
+//
+//fun main() = application {
+//    Window(
+//        onCloseRequest = ::exitApplication,
+//        state = rememberWindowState(width = Dp.Unspecified, height = Dp.Unspecified),
+//        title = "Adaptive",
+//        resizable = false
+//    ) {
+//        Column(Modifier.background(Color(0xFFEEEEEE))) {
+//            Row {
+//                Text("label 1", Modifier.size(100.dp, 100.dp).padding(10.dp).background(Color.White))
+//                Text("label 2", Modifier.size(150.dp, 200.dp).padding(5.dp).background(Color.White))
+//                Text("label 3", Modifier.size(200.dp, 300.dp).padding(25.dp).background(Color.White))
+//            }
+//        }
+//    }
+//}
+
+
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowPlacement
+import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 
 fun main() = application {
-    Window(
-        onCloseRequest = ::exitApplication,
-        state = rememberWindowState(width = Dp.Unspecified, height = Dp.Unspecified),
-        title = "Adaptive",
-        resizable = false
-    ) {
-        Column(Modifier.background(Color(0xFFEEEEEE))) {
-            Row {
-                Text("label 1", Modifier.size(100.dp, 100.dp).padding(10.dp).background(Color.White))
-                Text("label 2", Modifier.size(150.dp, 200.dp).padding(5.dp).background(Color.White))
-                Text("label 3", Modifier.size(200.dp, 300.dp).padding(25.dp).background(Color.White))
+    val state = rememberWindowState(placement = WindowPlacement.Maximized)
+
+    Window(onCloseRequest = ::exitApplication, state) {
+        Column {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(
+                    state.placement == WindowPlacement.Fullscreen,
+                    {
+                        state.placement = if (it) {
+                            WindowPlacement.Fullscreen
+                        } else {
+                            WindowPlacement.Floating
+                        }
+                    }
+                )
+                Text("isFullscreen")
             }
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(
+                    state.placement == WindowPlacement.Maximized,
+                    {
+                        state.placement = if (it) {
+                            WindowPlacement.Maximized
+                        } else {
+                            WindowPlacement.Floating
+                        }
+                    }
+                )
+                Text("isMaximized")
+            }
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(state.isMinimized, { state.isMinimized = !state.isMinimized })
+                Text("isMinimized")
+            }
+
+            Text(
+                "Position ${state.position}",
+                Modifier.clickable {
+                    val position = state.position
+                    if (position is WindowPosition.Absolute) {
+                        state.position = position.copy(x = state.position.x + 10.dp)
+                    }
+                }
+            )
+
+            Text(
+                "Size ${state.size}",
+                Modifier.clickable {
+                    state.size = state.size.copy(width = state.size.width + 10.dp)
+                }
+            )
         }
     }
 }
