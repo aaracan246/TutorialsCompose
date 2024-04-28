@@ -346,37 +346,54 @@
 //}
 
 
+//
+//import androidx.compose.material.Button
+//import androidx.compose.material.Text
+//import androidx.compose.runtime.getValue
+//import androidx.compose.runtime.mutableStateOf
+//import androidx.compose.runtime.remember
+//import androidx.compose.runtime.setValue
+//import androidx.compose.ui.Alignment
+//import androidx.compose.ui.window.DialogWindow
+//import androidx.compose.ui.window.Window
+//import androidx.compose.ui.window.WindowPosition
+//import androidx.compose.ui.window.application
+//import androidx.compose.ui.window.rememberDialogState
+//
+//fun main() = application {
+//    Window(
+//        onCloseRequest = ::exitApplication,
+//    ) {
+//        var isDialogOpen by remember { mutableStateOf(false) }
+//
+//        Button(onClick = { isDialogOpen = true }) {
+//            Text(text = "Open dialog")
+//        }
+//
+//        if (isDialogOpen) {
+//            DialogWindow(
+//                onCloseRequest = { isDialogOpen = false },
+//                state = rememberDialogState(position = WindowPosition(Alignment.Center))
+//            ) {
+//                // Dialog's content
+//            }
+//        }
+//    }
+//}
 
-import androidx.compose.material.Button
-import androidx.compose.material.Text
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.window.DialogWindow
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.application
-import androidx.compose.ui.window.rememberDialogState
 
-fun main() = application {
-    Window(
-        onCloseRequest = ::exitApplication,
-    ) {
-        var isDialogOpen by remember { mutableStateOf(false) }
+import androidx.compose.ui.awt.ComposeWindow
+import java.awt.Dimension
+import javax.swing.JFrame
+import javax.swing.SwingUtilities
 
-        Button(onClick = { isDialogOpen = true }) {
-            Text(text = "Open dialog")
+fun main() = SwingUtilities.invokeLater {
+    ComposeWindow().apply {
+        size = Dimension(300, 300)
+        defaultCloseOperation = JFrame.DISPOSE_ON_CLOSE
+        setContent {
+            // Content
         }
-
-        if (isDialogOpen) {
-            DialogWindow(
-                onCloseRequest = { isDialogOpen = false },
-                state = rememberDialogState(position = WindowPosition(Alignment.Center))
-            ) {
-                // Dialog's content
-            }
-        }
+        isVisible = true
     }
 }
