@@ -83,55 +83,121 @@
 //}
 
 
-import androidx.compose.material.Text
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+//import androidx.compose.material.Text
+//import androidx.compose.runtime.LaunchedEffect
+//import androidx.compose.runtime.getValue
+//import androidx.compose.runtime.mutableStateOf
+//import androidx.compose.runtime.remember
+//import androidx.compose.runtime.setValue
+//import androidx.compose.ui.geometry.Size
+//import androidx.compose.ui.graphics.Color
+//import androidx.compose.ui.graphics.drawscope.DrawScope
+//import androidx.compose.ui.graphics.painter.Painter
+//import androidx.compose.ui.window.Tray
+//import androidx.compose.ui.window.Window
+//import androidx.compose.ui.window.application
+//import kotlinx.coroutines.delay
+//
+//fun main() = application {
+//    var isVisible by remember { mutableStateOf(true) }
+//
+//    Window(
+//        onCloseRequest = { isVisible = false },
+//        visible = isVisible,
+//        title = "Counter",
+//    ) {
+//        var counter by remember { mutableStateOf(0) }
+//        LaunchedEffect(Unit) {
+//            while (true) {
+//                counter++
+//                delay(1000)
+//            }
+//        }
+//        Text(counter.toString())
+//    }
+//
+//    if (!isVisible) {
+//        Tray(
+//            TrayIcon,
+//            tooltip = "Counter",
+//            onAction = { isVisible = true },
+//            menu = {
+//                Item("Exit", onClick = ::exitApplication)
+//            },
+//        )
+//    }
+//}
+//
+//object TrayIcon : Painter() {
+//    override val intrinsicSize = Size(256f, 256f)
+//
+//    override fun DrawScope.onDraw() {
+//        drawOval(Color(0xFFFFA500))
+//    }
+//}
+
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.window.Tray
+import androidx.compose.ui.window.ApplicationScope
+import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import kotlinx.coroutines.delay
 
 fun main() = application {
-    var isVisible by remember { mutableStateOf(true) }
+    val applicationState = remember { MyApplicationState() }
 
-    Window(
-        onCloseRequest = { isVisible = false },
-        visible = isVisible,
-        title = "Counter",
-    ) {
-        var counter by remember { mutableStateOf(0) }
-        LaunchedEffect(Unit) {
-            while (true) {
-                counter++
-                delay(1000)
-            }
+    for (window in applicationState.windows) {
+        key(window) {
+            MyWindow(window)
         }
-        Text(counter.toString())
-    }
-
-    if (!isVisible) {
-        Tray(
-            TrayIcon,
-            tooltip = "Counter",
-            onAction = { isVisible = true },
-            menu = {
-                Item("Exit", onClick = ::exitApplication)
-            },
-        )
     }
 }
 
-object TrayIcon : Painter() {
-    override val intrinsicSize = Size(256f, 256f)
-
-    override fun DrawScope.onDraw() {
-        drawOval(Color(0xFFFFA500))
+@Composable
+private fun ApplicationScope.MyWindow(
+    state: MyWindowState
+) = Window(onCloseRequest = state::close, title = state.title) {
+    MenuBar {
+        Menu("File") {
+            Item("New window", onClick = state.openNewWindow)
+            Item("Exit", onClick = state.exit)
+        }
     }
+}
+
+private class MyApplicationState {
+    val windows = mutableStateListOf<MyWindowState>()
+
+    init {
+        windows += MyWindowState("Initial window")
+    }
+
+    fun openNewWindow() {
+        windows += MyWindowState("Window ${windows.size}")
+    }
+
+    fun exit() {
+        windows.clear()
+    }
+
+    private fun MyWindowState(
+        title: String
+    ) = MyWindowState(
+        title,
+        openNewWindow = ::openNewWindow,
+        exit = ::exit,
+        windows::remove
+    )
+}
+
+private class MyWindowState(
+    val title: String,
+    val openNewWindow: () -> Unit,
+    val exit: () -> Unit,
+    private val close: (MyWindowState) -> Unit
+) {
+    fun close() = close(this)
 }
