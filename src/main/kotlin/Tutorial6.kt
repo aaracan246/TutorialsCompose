@@ -307,40 +307,76 @@
 //    }
 //}
 
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.unit.DpSize
+//import androidx.compose.runtime.LaunchedEffect
+//import androidx.compose.runtime.snapshotFlow
+//import androidx.compose.ui.unit.DpSize
+//import androidx.compose.ui.window.Window
+//import androidx.compose.ui.window.WindowPosition
+//import androidx.compose.ui.window.application
+//import androidx.compose.ui.window.rememberWindowState
+//import kotlinx.coroutines.flow.filter
+//import kotlinx.coroutines.flow.launchIn
+//import kotlinx.coroutines.flow.onEach
+//
+//fun main() = application {
+//    val state = rememberWindowState()
+//
+//    Window(onCloseRequest = ::exitApplication, state) {
+//        // Content
+//
+//        LaunchedEffect(state) {
+//            snapshotFlow { state.size }
+//                .onEach(::onWindowResize)
+//                .launchIn(this)
+//
+//            snapshotFlow { state.position }
+//                .filter { it.isSpecified }
+//                .onEach(::onWindowRelocate)
+//                .launchIn(this)
+//        }
+//    }
+//}
+//
+//private fun onWindowResize(size: DpSize) {
+//    println("onWindowResize $size")
+//}
+//
+//private fun onWindowRelocate(position: WindowPosition) {
+//    println("onWindowRelocate $position")
+//}
+
+
+
+import androidx.compose.material.Button
+import androidx.compose.material.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.window.DialogWindow
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
-import androidx.compose.ui.window.rememberWindowState
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import androidx.compose.ui.window.rememberDialogState
 
 fun main() = application {
-    val state = rememberWindowState()
+    Window(
+        onCloseRequest = ::exitApplication,
+    ) {
+        var isDialogOpen by remember { mutableStateOf(false) }
 
-    Window(onCloseRequest = ::exitApplication, state) {
-        // Content
+        Button(onClick = { isDialogOpen = true }) {
+            Text(text = "Open dialog")
+        }
 
-        LaunchedEffect(state) {
-            snapshotFlow { state.size }
-                .onEach(::onWindowResize)
-                .launchIn(this)
-
-            snapshotFlow { state.position }
-                .filter { it.isSpecified }
-                .onEach(::onWindowRelocate)
-                .launchIn(this)
+        if (isDialogOpen) {
+            DialogWindow(
+                onCloseRequest = { isDialogOpen = false },
+                state = rememberDialogState(position = WindowPosition(Alignment.Center))
+            ) {
+                // Dialog's content
+            }
         }
     }
-}
-
-private fun onWindowResize(size: DpSize) {
-    println("onWindowResize $size")
-}
-
-private fun onWindowRelocate(position: WindowPosition) {
-    println("onWindowRelocate $position")
 }
