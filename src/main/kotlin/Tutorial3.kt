@@ -356,7 +356,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.singleWindowApplication
+
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
